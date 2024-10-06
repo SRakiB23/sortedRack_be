@@ -18,6 +18,7 @@ const authenticateUser = async (req, res, next) => {
       email: payload.email,
       role: payload.role,
       branch: payload.branch,
+      username: payload.username,
     };
     next();
   } catch (error) {
@@ -28,7 +29,9 @@ const authenticateUser = async (req, res, next) => {
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      throw new CustomError.UnauthorizedError("Unauthorize to access this route");
+      throw new CustomError.UnauthorizedError(
+        "Unauthorize to access this route"
+      );
     }
     next();
   };

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
-const jwt = require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
 
 const userSchema = new mongoose.Schema(
   {
@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema(
       required: [true, "Please provide name"],
       maxlength: 50,
       minlength: 3,
-      unique:true,
+      unique: true,
     },
     password: {
       type: String,
@@ -60,24 +60,30 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.pre("save", async function () {
-  if (!this.isModified('password')) return;
+  if (!this.isModified("password")) return;
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-userSchema.methods.comparePasword = async function(userPassword){
-  const isMatch = await bcrypt.compare(userPassword,this.password)
+userSchema.methods.comparePasword = async function (userPassword) {
+  const isMatch = await bcrypt.compare(userPassword, this.password);
   return isMatch;
-}
+};
 
 userSchema.methods.createJWT = function () {
   return jwt.sign(
-    { userId: this._id, email: this.email, role:this.role, branch:this.branch},
+    {
+      userId: this._id,
+      email: this.email,
+      role: this.role,
+      branch: this.branch,
+      userName: this.username,
+    },
     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_LIFETIME,
     }
-  )
-}
+  );
+};
 
 module.exports = mongoose.model("User", userSchema);

@@ -1,28 +1,45 @@
-// controllers/ticketController.js
-const Ticket = require('../models/Ticket');
-const { StatusCodes } = require('http-status-codes');
+const Ticket = require("../models/Ticket");
+const { StatusCodes } = require("http-status-codes");
 
+// Create a new ticket
 const createTicket = async (req, res) => {
-  const { userName, department, device, priority, additionalInfo } = req.body;
+  const {
+    userName,
+    email,
+    department,
+    device,
+    priority,
+    additionalInfo = [],
+  } = req.body;
 
   try {
-    const newTicket = await Ticket.create({ userName, department, device, priority, additionalInfo });
+    const newTicket = await Ticket.create({
+      userName,
+      email,
+      department,
+      device,
+      priority,
+      additionalInfo,
+    });
     res.status(StatusCodes.CREATED).json(newTicket);
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: error.message });
   }
 };
 
-// GET method for retrieving all tickets
+//Get all tickets
 const getTickets = async (req, res) => {
   try {
-    const tickets = await Ticket.find(); // Fetch all tickets from the database
-    res.status(StatusCodes.OK).json(tickets); // Respond with the list of tickets
+    const tickets = await Ticket.find(); // Fetch all tickets
+    res.status(StatusCodes.OK).json(tickets); // Respond with tickets list
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: error.message });
   }
 };
-
 
 // Get a specific ticket by ID
 const getTicketById = async (req, res) => {
@@ -31,15 +48,47 @@ const getTicketById = async (req, res) => {
     if (!ticket) {
       return res.status(404).json({ message: "Ticket not found" });
     }
-    res.status(200).json(ticket);
+    res.status(StatusCodes.OK).json(ticket);
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: error.message });
   }
 };
 
+// Update a ticket's status and additional comments
+const updateTicket = async (req, res) => {
+  const { status, comment } = req.body;
+
+  try {
+    const ticket = await Ticket.findById(req.params.id);
+    if (!ticket) {
+      return res.status(404).json({ message: "Ticket not found" });
+    }
+
+    // Update status if provided
+    if (status) {
+      ticket.status = status;
+    }
+
+    // Add a new comment to the array if provided
+    if (comment) {
+      const newComment = { comment }; // Will automatically include the current date
+      ticket.additionalInfo.push(newComment); // Push new comment into the array
+    }
+
+    await ticket.save(); // Save the updated ticket
+    res.status(StatusCodes.OK).json(ticket);
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: error.message });
+  }
+};
 
 module.exports = {
   createTicket,
   getTickets,
   getTicketById,
+  updateTicket,
 };
