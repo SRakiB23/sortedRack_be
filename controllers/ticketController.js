@@ -86,9 +86,21 @@ const updateTicket = async (req, res) => {
   }
 };
 
+const getMyTickets = async (req, res) => {
+  try {
+    const userId = req.user._id; // Assuming you're storing user info in req.user after authentication
+    const tickets = await Ticket.find({ author: userId }); // Assuming "author" is the field for the user ID
+    res.status(200).json(tickets);
+  } catch (error) {
+    console.error("Error fetching tickets:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   createTicket,
   getTickets,
   getTicketById,
   updateTicket,
+  getMyTickets,
 };
