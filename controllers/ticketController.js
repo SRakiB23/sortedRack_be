@@ -66,15 +66,14 @@ const updateTicket = async (req, res) => {
       return res.status(404).json({ message: "Ticket not found" });
     }
 
-    // Update status if provided
     if (status) {
       ticket.status = status;
     }
 
     // Add a new comment to the array if provided
     if (comment) {
-      const newComment = { comment }; // Will automatically include the current date
-      ticket.additionalInfo.push(newComment); // Push new comment into the array
+      const newComment = { comment }; 
+      ticket.additionalInfo.push(newComment); 
     }
 
     await ticket.save(); // Save the updated ticket
@@ -88,8 +87,8 @@ const updateTicket = async (req, res) => {
 
 const getMyTickets = async (req, res) => {
   try {
-    const userId = req.user._id; // Assuming you're storing user info in req.user after authentication
-    const tickets = await Ticket.find({ author: userId }); // Assuming "author" is the field for the user ID
+    const userId = req.user._id; 
+    const tickets = await Ticket.find({ author: userId });
     res.status(200).json(tickets);
   } catch (error) {
     console.error("Error fetching tickets:", error);

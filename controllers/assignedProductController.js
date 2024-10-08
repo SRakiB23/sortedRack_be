@@ -20,7 +20,7 @@ const createAssignedProduct = async (req, res) => {
   if (verifyuser.branch !== branch) {
     throw new CustomError.BadRequestError("User needs to be from same branch");
   }
-  if (verifyuser.role === "superadmin" && req.user.role === "admin") {
+  if (verifyuser.role === "superadmin" && req.user.role === "admin" || req.user.role === "user") {
     throw new CustomError.UnauthorizedError(
       "Not authorize to proceed with this task"
     );
