@@ -10,6 +10,7 @@ const createTicket = async (req, res) => {
     device,
     priority,
     additionalInfo = [],
+    author,
   } = req.body;
 
   try {
@@ -20,6 +21,7 @@ const createTicket = async (req, res) => {
       device,
       priority,
       additionalInfo,
+      author,
     });
     res.status(StatusCodes.CREATED).json(newTicket);
   } catch (error) {
@@ -28,6 +30,8 @@ const createTicket = async (req, res) => {
       .json({ message: error.message });
   }
 };
+
+
 
 //Get all tickets
 const getTickets = async (req, res) => {
@@ -58,41 +62,53 @@ const getTicketById = async (req, res) => {
 
 // Update a ticket's status and additional comments
 const updateTicket = async (req, res) => {
-  const { status, comment } = req.body;
+  const { id } = req.params;
+  const { additionalInfo } = req.body;
 
   try {
-    const ticket = await Ticket.findById(req.params.id);
-    if (!ticket) {
+    // Find the ticket by ID and update additionalInfo
+    const updatedTicket = await Ticket.findByIdAndUpdate(
+      id,
+      { additionalInfo }, // Updating additionalInfo array
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedTicket) {
       return res.status(404).json({ message: "Ticket not found" });
     }
 
-    if (status) {
-      ticket.status = status;
-    }
-
-    // Add a new comment to the array if provided
-    if (comment) {
-      const newComment = { comment }; 
-      ticket.additionalInfo.push(newComment); 
-    }
-
-    await ticket.save(); // Save the updated ticket
-    res.status(StatusCodes.OK).json(ticket);
+    res.status(200).json(updatedTicket);
   } catch (error) {
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: error.message });
+    res.status(500).json({ message: "Error updating ticket", error });
   }
 };
 
+
 const getMyTickets = async (req, res) => {
   try {
-    const userId = req.user._id; 
+    const userId = req.user.userId;
     const tickets = await Ticket.find({ author: userId });
     res.status(200).json(tickets);
   } catch (error) {
     console.error("Error fetching tickets:", error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Delete a ticket
+const deleteTicket = async (req, res) => {
+  try {
+    const ticketId = req.params.id; // Get the ticket ID from the request parameters
+    const deletedTicket = await Ticket.findByIdAndDelete(ticketId); // Delete the ticket by ID
+
+    if (!deletedTicket) {
+      return res.status(404).json({ message: 'Ticket not found' });
+    }
+
+    res.status(200).json({ message: 'Ticket deleted successfully', ticket: deletedTicket });
+  } catch (error) {
+    console.error('Error deleting ticket:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -102,4 +118,5 @@ module.exports = {
   getTicketById,
   updateTicket,
   getMyTickets,
+  deleteTicket,
 };

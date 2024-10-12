@@ -9,6 +9,10 @@ const CommentSchema = new mongoose.Schema({
     type: Date,
     default: Date.now, // Automatically set the current date
   },
+  userName: {
+    type: String,
+    required: true,
+  }
 });
 
 const TicketSchema = new mongoose.Schema(
@@ -41,6 +45,11 @@ const TicketSchema = new mongoose.Schema(
     additionalInfo: {
       type: [CommentSchema], // Array of comment objects
       default: [],
+    },
+    author: {
+      type: mongoose.Schema.Types.ObjectId, // Reference to User schema
+      ref: "User",
+      required: true, // Ensure tickets are always associated with a user
     },
   },
   { timestamps: true }
