@@ -174,6 +174,25 @@ const getAllAssignedProduct = async (req, res) => {
   }
 };
 
+const getAssignedDevicesForUser = async (req, res) => {
+  const { userId } = req.params;
+  const assignedDevices = await AssignedProduct.find({
+    user: userId,
+    status: "active",
+  }).populate({
+    path: "product",
+    select: "productType branch productCategory systemName systemBrand",
+  });
+
+  if (assignedDevices.length === 0) {
+    return res
+      .status(StatusCodes.NOT_FOUND)
+      .json({ message: "No devices assigned" });
+  }
+
+  res.status(StatusCodes.OK).json({ assignedDevices });
+};
+
 const getSingleAssignedProduct = async (req, res) => {
   const { id: assignedDeviceId } = req.params;
 
@@ -284,4 +303,5 @@ module.exports = {
   removeAssignedProduct,
   deleteAllAssignedProduct,
   // deleteAssignedProduct,
+  getAssignedDevicesForUser,
 };

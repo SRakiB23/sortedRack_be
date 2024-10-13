@@ -9,6 +9,7 @@ const {
   removeAssignedProduct,
   deleteAllAssignedProduct,
   // deleteAssignedProduct,
+  getAssignedDevicesForUser,
 } = require("../controllers/assignedProductController");
 
 const {
@@ -52,5 +53,11 @@ router
 //   [authenticateUser, authorizeRoles("superadmin", "admin")],
 //   deleteAssignedProduct
 // );
+
+// router
+//   .route("/getUserAssignedDevices/:userId")
+//   .get(authenticateUser, getAssignedDevicesForUser);
+
+router.get("/getUserAssignedDevices/:userId", getAssignedDevicesForUser);
 
 module.exports = router;

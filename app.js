@@ -22,7 +22,6 @@ const morgan = require("morgan");
 // dataBase
 const connDb = require("./db/connect");
 
-
 // routes
 const authRoute = require("./routes/authRoute");
 const userRoute = require("./routes/userRote");
@@ -46,12 +45,14 @@ app.use(
 );
 app.use(express.json());
 
-app.use(cors({
-  origin: "http://localhost:3000",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  // allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    // allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 app.use(helmet());
 app.use(xss());
 app.use(morgan("tiny"));
@@ -78,7 +79,9 @@ console.log(port, "port url");
 const start = async () => {
   try {
     await connDb(process.env.MONGO_URL);
-    app.listen(port, () => console.log("SortedRack Backend Service is Runnning.."));
+    app.listen(port, () =>
+      console.log("SortedRack Backend Service is Runnning..")
+    );
   } catch (error) {
     console.log(error, "MongoDB URL is invalid.");
   }
