@@ -31,8 +31,6 @@ const createTicket = async (req, res) => {
   }
 };
 
-
-
 //Get all tickets
 const getTickets = async (req, res) => {
   try {
@@ -62,27 +60,33 @@ const getTicketById = async (req, res) => {
 
 // Update a ticket's status and additional comments
 const updateTicket = async (req, res) => {
-  const { id } = req.params;
-  const { additionalInfo } = req.body;
+  const { status, additionalInfo } = req.body;
+  const ticketId = req.params.id;
 
   try {
-    // Find the ticket by ID and update additionalInfo
-    const updatedTicket = await Ticket.findByIdAndUpdate(
-      id,
-      { additionalInfo }, // Updating additionalInfo array
-      { new: true } // Return the updated document
-    );
+    const ticket = await Ticket.findById(ticketId);
 
-    if (!updatedTicket) {
-      return res.status(404).json({ message: "Ticket not found" });
+    if (!ticket) {
+      return res.status(404).json({ message: "Ticket not found." });
     }
 
+    // Update the status
+    if (status) {
+      ticket.status = status;
+    }
+
+    // Update the additionalInfo
+    if (additionalInfo && Array.isArray(additionalInfo)) {
+      ticket.additionalInfo = additionalInfo;
+    }
+
+    const updatedTicket = await ticket.save();
     res.status(200).json(updatedTicket);
   } catch (error) {
-    res.status(500).json({ message: "Error updating ticket", error });
+    console.error("Error updating ticket:", error);
+    res.status(500).json({ message: "Error updating ticket." });
   }
 };
-
 
 const getMyTickets = async (req, res) => {
   try {
@@ -102,13 +106,15 @@ const deleteTicket = async (req, res) => {
     const deletedTicket = await Ticket.findByIdAndDelete(ticketId); // Delete the ticket by ID
 
     if (!deletedTicket) {
-      return res.status(404).json({ message: 'Ticket not found' });
+      return res.status(404).json({ message: "Ticket not found" });
     }
 
-    res.status(200).json({ message: 'Ticket deleted successfully', ticket: deletedTicket });
+    res
+      .status(200)
+      .json({ message: "Ticket deleted successfully", ticket: deletedTicket });
   } catch (error) {
-    console.error('Error deleting ticket:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error deleting ticket:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 

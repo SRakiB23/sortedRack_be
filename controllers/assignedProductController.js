@@ -20,7 +20,10 @@ const createAssignedProduct = async (req, res) => {
   if (verifyuser.branch !== branch) {
     throw new CustomError.BadRequestError("User needs to be from same branch");
   }
-  if (verifyuser.role === "superadmin" && req.user.role === "admin" || req.user.role === "user") {
+  if (
+    (verifyuser.role === "superadmin" && req.user.role === "admin") ||
+    req.user.role === "user"
+  ) {
     throw new CustomError.UnauthorizedError(
       "Not authorize to proceed with this task"
     );
@@ -70,7 +73,6 @@ const createAssignedProduct = async (req, res) => {
 };
 
 const getAllAssignedProduct = async (req, res) => {
-  
   if (req.user.role === "superadmin") {
     const response = await AssignedProduct.find({ status: "active" })
       .populate({ path: "user", select: "email fname lname userName" })
@@ -124,13 +126,13 @@ const getAllAssignedProduct = async (req, res) => {
       branch: req.user.branch,
       status: "active",
     })
-    .populate({ path: "user", select: "email fname lname userName" })
-    .populate({
-      path: "product",
-      select:
-        "productType branch productCategory warrantyPeriod systemName systemModel systemBrand cpu ram storageType storageCapacity os macAddress productKey serialNumber accessoriesName networkDeviceName tag",
-    })
-    .populate({ path: "assignedBy", select: "email" });
+      .populate({ path: "user", select: "email fname lname userName" })
+      .populate({
+        path: "product",
+        select:
+          "productType branch productCategory warrantyPeriod systemName systemModel systemBrand cpu ram storageType storageCapacity os macAddress productKey serialNumber accessoriesName networkDeviceName tag",
+      })
+      .populate({ path: "assignedBy", select: "email" });
 
     const finalResponse = response.map((item) => {
       const assignedDevicesList = {};
@@ -179,15 +181,14 @@ const getSingleAssignedProduct = async (req, res) => {
     const singleAssignedDevice = await AssignedProduct.findOne({
       _id: assignedDeviceId,
     })
-    .populate({ path: "user", select: "email fname lname userName" })
-    .populate({
-      path: "product",
-      select:
-        "productType branch productCategory warrantyPeriod systemName systemModel systemBrand cpu ram storageType storageCapacity os macAddress productKey serialNumber accessoriesName networkDeviceName tag",
-    })
-    .populate({ path: "assignedBy", select: "email" });
+      .populate({ path: "user", select: "email fname lname userName" })
+      .populate({
+        path: "product",
+        select:
+          "productType branch productCategory warrantyPeriod systemName systemModel systemBrand cpu ram storageType storageCapacity os macAddress productKey serialNumber accessoriesName networkDeviceName tag",
+      })
+      .populate({ path: "assignedBy", select: "email" });
 
-    
     if (!singleAssignedDevice) {
       throw new CustomError.NotFoundError(
         `No document found with id ${assignedDeviceId}`
@@ -201,13 +202,13 @@ const getSingleAssignedProduct = async (req, res) => {
       _id: assignedDeviceId,
       branch: req.user.branch,
     })
-    .populate({ path: "user", select: "email fname lname userName" })
-    .populate({
-      path: "product",
-      select:
-        "productType branch productCategory warrantyPeriod systemName systemModel systemBrand cpu ram storageType storageCapacity os macAddress productKey serialNumber accessoriesName networkDeviceName tag",
-    })
-    .populate({ path: "assignedBy", select: "email" });
+      .populate({ path: "user", select: "email fname lname userName" })
+      .populate({
+        path: "product",
+        select:
+          "productType branch productCategory warrantyPeriod systemName systemModel systemBrand cpu ram storageType storageCapacity os macAddress productKey serialNumber accessoriesName networkDeviceName tag",
+      })
+      .populate({ path: "assignedBy", select: "email" });
 
     if (!singleAssignedDevice) {
       throw new CustomError.NotFoundError(
