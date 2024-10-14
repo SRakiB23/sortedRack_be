@@ -45,13 +45,15 @@ app.use(
 );
 app.use(express.json());
 
+const corsOptions = {
+  origin: "http://localhost:3000", // Allow requests from this origin
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], // Allow these HTTP methods
+  allowedHeaders: ["Content-Type", "Authorization"], // Add any custom headers if required
+};
+
+
 app.use(
-  cors({
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    // allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
+  cors((corsOptions))
 );
 app.use(helmet());
 app.use(xss());

@@ -32,9 +32,7 @@ const getAllUsers = async (req, res) => {
   const users = example.map((u) => {
     return { ...u, username: u?.username || "" };
   });
-
   console.log(users);
-
   res.status(StatusCodes.OK).json({ user: users, nbhits: users.length });
 };
 
@@ -79,28 +77,28 @@ const UpdateUser = async (req, res) => {
 };
 
 const UpdateUserRole = async (req, res) => {
-  // const {
-  //   params: { id: userId },
-  //   body: { role },
-  // } = req;
-  // if (!role) {
-  //   throw new CustomError.BadRequestError("Please specify the role");
-  // }
-  // const user = await User.findOne({ _id: userId });
-  // if (!user) {
-  //   throw new CustomError.BadRequestError(
-  //     `No user found with UserId ${userId}`
-  //   );
-  // }
-  // if (req.user.role !== "superadmin") {
-  //   throw new CustomError.UnauthorizedError(
-  //     "Not authorize to perform this task"
-  //   );
-  // }
-  // user.role = role;
-  // await user.save();
+  const {
+    params: { id: userId },
+    body: { role },
+  } = req;
+  if (!role) {
+    throw new CustomError.BadRequestError("Please specify the role");
+  }
+  const user = await User.findOne({ _id: userId });
+  if (!user) {
+    throw new CustomError.BadRequestError(
+      `No user found with UserId ${userId}`
+    );
+  }
+  if (req.user.role !== "superadmin") {
+    throw new CustomError.UnauthorizedError(
+      "Not authorize to perform this task"
+    );
+  }
+  user.role = role;
+  await user.save();
 
-  // res.status(StatusCodes.OK).json({ user });
+  res.status(StatusCodes.OK).json({ user });
   res.status(StatusCodes.OK).json({ message: "Depricated endPoint" });
 };
 
